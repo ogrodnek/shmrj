@@ -1,0 +1,3 @@
+Simple hive map reduce framework for java.
+
+dependencies: apache common lang
