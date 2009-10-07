@@ -58,6 +58,24 @@ public class GenericMRTest {
   }
   
   @Test
+  public void testKVSplitMap() throws Exception {
+    final String in = "k1=v1,k2=v2\nk1=v2,k2=v3";
+    final String expected = "k1\tv1\nk2\tv2\nk1\tv2\nk2\tv3\n";
+    final StringWriter out = new StringWriter();
+    
+    new GenericMR().map(new StringReader(in), out, new Mapper() {
+      public void map(String[] record, Output output) throws Exception {
+        for (final String kvs : record[0].split(",")) {
+          final String[] kv = kvs.split("=");
+          output.collect(new String[] { kv[0], kv[1] });
+        }
+      }
+    });
+    
+    Assert.assertEquals(expected, out.toString());
+  }
+  
+  @Test
   public void testIdentityReduce() throws Exception {
     final String in = "a\tb\nc\td";
     final StringWriter out = new StringWriter();
