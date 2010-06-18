@@ -1,3 +1,7 @@
 Simple hive map reduce framework for java.
 
 dependencies: apache common lang
+
+This project is now a part of Hive contrib.
+
+See: http://github.com/apache/hive/tree/trunk/contrib/src/java/org/apache/hadoop/hive/contrib/mr/
