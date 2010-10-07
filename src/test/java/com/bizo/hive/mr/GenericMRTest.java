@@ -18,6 +18,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.Assert;
 
@@ -113,10 +114,13 @@ public class GenericMRTest {
     final String in = "hello\t1\nhello\t2\nokay\t4\nokay\t6\nokay\t2";
     final StringWriter out = new StringWriter();
     
+    final AtomicInteger seenHello = new AtomicInteger(0);
+    
     new GenericMR().reduce(new StringReader(in), out, new Reducer() {
       public void reduce(String key, Iterator<String[]> records, Output output) throws Exception {
         int count = 0;
         if (key.equals("hello")) {
+          seenHello.addAndGet(1);
           return;
         }
         
@@ -128,6 +132,7 @@ public class GenericMRTest {
       }
     });
     
+    Assert.assertEquals(1, seenHello.get());
     final String expected = "okay\t12\n";
     Assert.assertEquals(expected, out.toString());
   }
@@ -137,6 +142,8 @@ public class GenericMRTest {
     final String in = "hello\t1\nhello\t2\nokay\t4\nokay\t6\nokay\t2";
     final StringWriter out = new StringWriter();
     
+    final AtomicInteger seenHello = new AtomicInteger(0);
+    
     new GenericMR().reduce(new StringReader(in), out, new Reducer() {
       public void reduce(String key, Iterator<String[]> records, Output output) throws Exception {
         int count = 0;
@@ -144,6 +151,7 @@ public class GenericMRTest {
         while (records.hasNext()) {
           final String[] record = records.next();
           if (record[0].equals("hello")) {
+            seenHello.addAndGet(1);
             return;
           }
           count += Integer.parseInt(record[1]); 
@@ -153,6 +161,7 @@ public class GenericMRTest {
       }
     });
     
+    Assert.assertEquals(1, seenHello.get());
     final String expected = "okay\t12\n";
     Assert.assertEquals(expected, out.toString());
   }  
