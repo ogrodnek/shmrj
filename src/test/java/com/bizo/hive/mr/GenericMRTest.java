@@ -108,6 +108,55 @@ public class GenericMRTest {
     Assert.assertEquals(expected, out.toString());
   }
   
+  @Test
+  public void testSkippedRowsReduce() throws Exception {
+    final String in = "hello\t1\nhello\t2\nokay\t4\nokay\t6\nokay\t2";
+    final StringWriter out = new StringWriter();
+    
+    new GenericMR().reduce(new StringReader(in), out, new Reducer() {
+      public void reduce(String key, Iterator<String[]> records, Output output) throws Exception {
+        int count = 0;
+        if (key.equals("hello")) {
+          return;
+        }
+        
+        while (records.hasNext()) {
+          count += Integer.parseInt(records.next()[1]); 
+        }
+        
+        output.collect(new String[] { key, String.valueOf(count) });        
+      }
+    });
+    
+    final String expected = "okay\t12\n";
+    Assert.assertEquals(expected, out.toString());
+  }
+  
+  @Test
+  public void testSkippedRowsReduce2() throws Exception {
+    final String in = "hello\t1\nhello\t2\nokay\t4\nokay\t6\nokay\t2";
+    final StringWriter out = new StringWriter();
+    
+    new GenericMR().reduce(new StringReader(in), out, new Reducer() {
+      public void reduce(String key, Iterator<String[]> records, Output output) throws Exception {
+        int count = 0;
+
+        while (records.hasNext()) {
+          final String[] record = records.next();
+          if (record[0].equals("hello")) {
+            return;
+          }
+          count += Integer.parseInt(record[1]); 
+        }
+        
+        output.collect(new String[] { key, String.valueOf(count) });        
+      }
+    });
+    
+    final String expected = "okay\t12\n";
+    Assert.assertEquals(expected, out.toString());
+  }  
+  
   private Mapper identityMapper() {
     return new Mapper() {
       @Override

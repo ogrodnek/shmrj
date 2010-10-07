@@ -72,7 +72,9 @@ public final class GenericMR {
     handle(in, out, new RecordProcessor() {
       @Override
       public void processNext(RecordReader reader, Output output) throws Exception {
-        reducer.reduce(reader.peek()[0], new KeyRecordIterator(reader.peek()[0], reader), output);
+        final KeyRecordIterator it = new KeyRecordIterator(reader.peek()[0], reader);
+        reducer.reduce(reader.peek()[0], it, output);
+        while (it.hasNext()) { it.next(); };
       }
     });
   }
