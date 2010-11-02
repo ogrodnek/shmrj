@@ -15,8 +15,10 @@ public final class TestOutput implements Output {
   private List<String[]> lines = new ArrayList<String[]>();
 
   @Override
-  public void collect(final String[] arg0) throws Exception {
-    lines.add(arg0);
+  public void collect(final String[] row) throws Exception {
+    final String[] copy = new String[row.length];
+    System.arraycopy(row, 0, copy, 0, row.length);
+    lines.add(copy);
   }
   
   public List<String[]> getLines() {
